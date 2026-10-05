@@ -19,6 +19,7 @@
     "ejs": "^7.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.5",
     "sequelize": "^6.37.8",
     "tailwindcss": "^4.3.3"

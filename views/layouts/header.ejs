@@ -1,35 +1,131 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="/output.css">
+
     <title><%= title %></title>
 </head>
 
 <body class="bg-gray-100">
-    <header class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between">
-            <h1 class="text-xl font-bold">Expense Tracker</h1>
-            <nav class="flex gap-5">
-                <% if (isLoggedIn) { %>
 
-                    <a href="/expenses" class="hover:text-gray-200">
+    <header class="bg-blue-600 text-white p-4">
+
+        <div class="container mx-auto flex justify-between items-center">
+
+            <h1 class="text-xl font-bold">
+                Expense Tracker
+            </h1>
+
+            <nav class="flex gap-5 items-center">
+
+                <!-- Logged In -->
+                <div
+                    id="loggedInLinks"
+                    class="hidden gap-5 items-center"
+                >
+
+                    <a
+                        href="/expenses"
+                        class="hover:text-gray-200"
+                    >
                         View Expenses
                     </a>
-                    <a href="/expenses/add" class="hover:text-gray-200">
+
+                    <a
+                        href="/expenses/add"
+                        class="hover:text-gray-200"
+                    >
                         Add Expense
                     </a>
 
-                <% } else { %>
+                    <button
+                        type="button"
+                        onclick="handleLogout()"
+                        class="hover:text-gray-200"
+                    >
+                        Logout
+                    </button>
 
-                    <a href="/register" class="hover:text-gray-200">
+                </div>
+
+
+                <!-- Logged Out -->
+                <div
+                    id="loggedOutLinks"
+                    class="flex gap-5 items-center"
+                >
+
+                    <a
+                        href="/register"
+                        class="hover:text-gray-200"
+                    >
                         SignUp
                     </a>
 
-                <% } %>
+                    <a
+                        href="/login"
+                        class="hover:text-gray-200"
+                    >
+                        Login
+                    </a>
+
+                </div>
+
             </nav>
+
         </div>
+
     </header>
+
     <main class="container mx-auto p-6">
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const token = localStorage.getItem('token');
+
+            const loggedInLinks =
+                document.getElementById('loggedInLinks');
+
+            const loggedOutLinks =
+                document.getElementById('loggedOutLinks');
+
+
+            if (token) {
+
+                // Logged in
+                loggedInLinks.classList.remove('hidden');
+                loggedInLinks.classList.add('flex');
+
+                loggedOutLinks.classList.add('hidden');
+
+            } else {
+
+                // Logged out
+                loggedInLinks.classList.add('hidden');
+
+                loggedOutLinks.classList.remove('hidden');
+                loggedOutLinks.classList.add('flex');
+
+            }
+
+        });
+
+
+        const handleLogout = () => {
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            window.location.href = '/login';
+
+        };
+
+    </script>

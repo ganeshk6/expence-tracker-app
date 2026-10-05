@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
 const User = require('../modules/user');
 
@@ -40,7 +41,18 @@ const signup = async(req, res) => {
             full_name: user.full_name,
             email: user.email
         };
-        return sendSuccessResponse(res, userData, 'User registered successfully', 201);
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: '1d'
+            }
+
+        );
+        return sendSuccessResponse(res, {user:userData, token:token}, 'User registered successfully', 201);
     }catch(err){
         return sendErrorResponse(res, err.message, 'Failed to signup user', 500);
     }
@@ -80,18 +92,17 @@ const createSignin = async (req, res) => {
             full_name: user.full_name,
             email: user.email
         };
-
-        req.session.regenerate((err) => {
-
-            if (err) {
-                return sendErrorResponse(res,err.message,'Failed to create session',500);
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: '1d'
             }
-
-            req.session.userId = user.id;
-            req.session.email = user.email;
-
-            return sendSuccessResponse(res,userData,'Login successful',200);
-        });
+        );
+        return sendSuccessResponse(res,{user:userData, token: token},'Login successful',200);
 
     } catch (err) {
         return sendErrorResponse(res,err.message,'Failed to login user',500);

@@ -9,7 +9,7 @@ const addExpencePage = (req, res) => {
 
 const addExpence = async (req, res) => {
     try{
-        const userId = req.session.userId;
+        const userId = req.user.id;
         const {amount, category, description} = req.body;
 
         const expense = await Expense.create({
@@ -33,7 +33,7 @@ const getExpencePage = (req, res) => {
 
 const getAllExpences = async(req, res) => {
     try{
-        const userId = req.session.userId;
+        const userId = req.user.id;
         const expenses = await Expense.findAll({
             where:{
                 userId:userId
@@ -48,7 +48,7 @@ const getAllExpences = async(req, res) => {
 const deleteExpense = async(req, res) => {
     try{
         const { id } = req.params;
-        const userId = req.session.userId;
+        const userId = req.user.id;
         const deletedExpense = await Expense.destroy({
             where: {
                 id: id,

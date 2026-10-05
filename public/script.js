@@ -17,8 +17,10 @@ const handlecreateAccount = (event) => {
 
     axios.post('http://localhost:3000/api/signup', data)
     .then((res)=>{
+        const token = res.data.data.token;
+        localStorage.setItem('token',token);
         alert(res.data.message);
-        window.location.href = '/login';
+        window.location.href = '/expenses';
     })
     .catch((err)=>{
         console.error(err);
@@ -40,8 +42,10 @@ const handleLogin = (event) => {
 
     axios.post('http://localhost:3000/api/login', data)
     .then((res)=>{
+        const token = res.data.data.token;
+        localStorage.setItem('token',token);
         alert(res.data.message);
-        window.location.href = '/';
+        window.location.href = '/expenses';
     })
     .catch((err)=>{
         console.error(err);
@@ -63,7 +67,12 @@ const handleAddExpence = (event) => {
         category:category,
         description:description
     }
-    axios.post('http://localhost:3000/expenses/api/add',data)
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:3000/expenses/api/add',data,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
     .then((res)=>{
         if(res.data){
             alert(res.data.message);
@@ -79,8 +88,13 @@ const handleAddExpence = (event) => {
 }
 
 const displayExpenses = () => {
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:3000/expenses/list', {}, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
 
-    axios.post('http://localhost:3000/expenses')
+        })
         .then((res) => {
 
             const expensesData = res.data.data;
@@ -143,7 +157,7 @@ const displayExpenses = () => {
 };
 
 const handleDeleteExpense = (expenseId) => {
-
+    
     const confirmDelete = confirm(
         'Are you sure you want to delete this expense?'
     );
@@ -151,8 +165,12 @@ const handleDeleteExpense = (expenseId) => {
     if (!confirmDelete) {
         return;
     }
-
-    axios.delete(`http://localhost:3000/expenses/delete/${expenseId}`)
+    const token = localStorage.getItem('token');
+    axios.delete(`http://localhost:3000/expenses/delete/${expenseId}`,{
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
         .then((res) => {
 
             alert(res.data.message);
