@@ -1,0 +1,26 @@
+{
+  "name": "expencetracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tailwind": "tailwindcss -i ./public/input.css -o ./public/output.css --watch",
+    "start": "nodemon app.js & npm run tailwind"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "axios": "^1.20.0",
+    "ejs": "^7.0.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.5",
+    "sequelize": "^6.37.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
