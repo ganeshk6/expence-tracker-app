@@ -40,7 +40,7 @@ const signup = async(req, res) => {
             full_name: user.full_name,
             email: user.email
         };
-        sendSuccessResponse(res, userData, 'User registered successfully', 201);
+        return sendSuccessResponse(res, userData, 'User registered successfully', 201);
     }catch(err){
         return sendErrorResponse(res, err.message, 'Failed to signup user', 500);
     }

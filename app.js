@@ -4,8 +4,10 @@ const session = require('express-session');
 const path = require('path');
 const app = express()
 const PORT = process.env.PORT || 3000;
+require('./modules');
 
 const authRouter = require('./routes/authRoutes');
+const expenceRouter = require('./routes/expenceRoutes');
 const sequelize = require('./utils/db_connect');
 
 app.use(express.json());
@@ -23,7 +25,12 @@ app.use(
         }
     })
 );
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = !!req.session.userId;
+    res.locals.userId = req.session.userId || null;
 
+    next();
+});
 // EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -36,6 +43,7 @@ app.get("/", (req, res)=>{
     });
 })
 app.use('/', authRouter);
+app.use('/expenses', expenceRouter);
 
 sequelize.sync({force: false})
 .then(()=>{

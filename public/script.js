@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', ()=>{
+    displayExpenses();
+})
+
 const handlecreateAccount = (event) => {
     event.preventDefault();
 
@@ -46,3 +50,123 @@ const handleLogin = (event) => {
         alert(message);
     })
 }
+
+const handleAddExpence = (event) => {
+    event.preventDefault();
+
+    const amount = event.target.amount.value;
+    const category = event.target.category.value;
+    const description = event.target.description.value;
+
+    const data = {
+        amount:amount,
+        category:category,
+        description:description
+    }
+    axios.post('http://localhost:3000/expenses/api/add',data)
+    .then((res)=>{
+        if(res.data){
+            alert(res.data.message);
+            window.location.href = '/expenses';
+        }
+    })
+    .catch((err)=>{
+        console.error(err);
+        const message = err.response?.data?.message || 'Something went wrong. Please try again.';
+
+        alert(message);
+    })
+}
+
+const displayExpenses = () => {
+
+    axios.post('http://localhost:3000/expenses')
+        .then((res) => {
+
+            const expensesData = res.data.data;
+            const tableBody = document.getElementById('expenseListTableBody');
+
+            tableBody.innerHTML = '';
+
+            if (!expensesData || expensesData.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                            No expenses added yet.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            expensesData.forEach((expense) => {
+
+                const row = document.createElement('tr');
+
+                row.className = 'hover:bg-gray-50 transition';
+
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        ${expense.amount}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        ${expense.category}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        ${expense.description}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        <button
+                            class="bg-red-600 text-white px-5 py-3 rounded-md
+                                   hover:bg-red-700 transition"
+                            onclick="handleDeleteExpense(${expense.id})"
+                        >
+                            Delete
+                        </button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+        })
+        .catch((err) => {
+
+            console.error(err);
+
+        });
+};
+
+const handleDeleteExpense = (expenseId) => {
+
+    const confirmDelete = confirm(
+        'Are you sure you want to delete this expense?'
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    axios.delete(`http://localhost:3000/expenses/delete/${expenseId}`)
+        .then((res) => {
+
+            alert(res.data.message);
+            displayExpenses();
+
+        })
+        .catch((err) => {
+
+            console.error(err);
+
+            const message =
+                err.response?.data?.message ||
+                'Something went wrong. Please try again.';
+
+            alert(message);
+        });
+};

@@ -1,0 +1,18 @@
+<%- include('../../layouts/header', { title: 'All Expenses - Expense Tracker' }) %>
+<p class="text-2xl font-bold text-gray-800">All Expenses</p>
+<div class="mt-6 overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+    <table class="w-full text-left text-sm text-gray-600">
+        <thead class="bg-gray-100 text-xs uppercase text-gray-700">
+            <tr>
+                <th class="px-6 py-4">Amount</th>
+                <th class="px-6 py-4">Category</th>
+                <th class="px-6 py-4">Description</th>
+                <th class="px-6 py-4">Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="expenseListTableBody" class="divide-y divide-gray-200 bg-white">
+        </tbody>
+    </table>
+</div>
+<%- include('../../layouts/footer') %>
