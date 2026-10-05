@@ -4,6 +4,7 @@ const app = express()
 const PORT = 3000
 
 const authRouter = require('./routes/authRoutes');
+const sequelize = require('./utils/db_connect');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,6 +22,13 @@ app.get("/", (req, res)=>{
 })
 app.use('/', authRouter);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+sequelize.sync({force: false})
+.then(()=>{
+    console.log("Database synchronized")
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+})
+.catch((err)=>{
+    console.error(err);
+})
