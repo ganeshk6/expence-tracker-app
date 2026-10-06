@@ -188,3 +188,41 @@ const handleDeleteExpense = (expenseId) => {
             alert(message);
         });
 };
+
+const cashfree = Cashfree({
+    mode: 'sandbox',
+});
+
+document.getElementById("buyPremiumBtn").addEventListener("click", async () => {
+    try{
+
+        const token = localStorage.getItem('token');
+    
+        const res = await axios.post('http://localhost:3000/pay', {}, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
+        console.log("Backend response:", res.data);
+        const paymentSessionId = res.data.data.payment_session_id;
+        console.log("Payment Session ID:", paymentSessionId);
+    
+        if (!paymentSessionId) {
+            console.error("Payment session ID missing");
+            return;
+        }
+    
+        const checkoutOptions = {
+            paymentSessionId: paymentSessionId,
+            redirectTarget: "_self",
+        };
+        console.log("Opening Cashfree...");
+    
+        const result = await cashfree.checkout(checkoutOptions);
+    
+        console.log("Checkout result:", result);
+    }catch(err){
+        console.log("Something error durong payment", err.message);
+    }
+    
+})

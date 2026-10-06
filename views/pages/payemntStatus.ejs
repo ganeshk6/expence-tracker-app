@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../layouts/header', { title: 'Payment Status - Expense Tracker' }) %>
+    <div class="min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md w-full">
+    
+            <% if (success) { %>
+    
+                <div class="text-6xl mb-4">
+                    🎉
+                </div>
+    
+                <h1 class="text-2xl font-bold text-green-600 mb-3">
+                    Payment Successful
+                </h1>
+    
+                <p class="text-gray-600 mb-6">
+                    <%= message %>
+                </p>
+    
+                <div class="bg-gray-50 rounded-lg p-4 text-left mb-6">
+    
+                    <p class="mb-2">
+                        <strong>Order ID:</strong>
+                        <%= orderId %>
+                    </p>
+    
+                    <p class="mb-2">
+                        <strong>Amount:</strong>
+                        ₹<%= amount %>
+                    </p>
+    
+                    <p class="mb-2">
+                        <strong>Membership:</strong>
+                        Premium Monthly
+                    </p>
+    
+                </div>
+    
+                <a
+                    href="/"
+                    class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
+                >
+                    Go to Dashboard
+                </a>
+    
+            <% } else { %>
+    
+                <div class="text-6xl mb-4">
+                    ⚠️
+                </div>
+    
+                <h1 class="text-2xl font-bold text-red-600 mb-3">
+                    Payment Not Completed
+                </h1>
+    
+                <p class="text-gray-600 mb-6">
+                    <%= message %>
+                </p>
+    
+                <% if (orderId) { %>
+                    <p class="text-sm text-gray-500 mb-5">
+                        Order ID: <%= orderId %>
+                    </p>
+                <% } %>
+    
+                <a
+                    href="/"
+                    class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg"
+                >
+                    Try Again
+                </a>
+    
+            <% } %>
+    
+        </div>
+    </div>
+
+<%- include('../layouts/footer') %>

@@ -17,9 +17,9 @@
 
         <div class="container mx-auto flex justify-between items-center">
 
-            <h1 class="text-xl font-bold">
+            <a class="text-xl font-bold" href="/">
                 Expense Tracker
-            </h1>
+            </a>
 
             <nav class="flex gap-5 items-center">
 
@@ -49,6 +49,9 @@
                         class="hover:text-gray-200"
                     >
                         Logout
+                    </button>
+                    <button type="button" id="buyPremiumBtn" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-xl hover:shadow-amber-500/40">
+                        Buy peremium membership
                     </button>
 
                 </div>
@@ -91,16 +94,12 @@
 
             const token = localStorage.getItem('token');
 
-            const loggedInLinks =
-                document.getElementById('loggedInLinks');
-
-            const loggedOutLinks =
-                document.getElementById('loggedOutLinks');
+            const loggedInLinks = document.getElementById('loggedInLinks');
+            const loggedOutLinks = document.getElementById('loggedOutLinks');
 
 
             if (token) {
 
-                // Logged in
                 loggedInLinks.classList.remove('hidden');
                 loggedInLinks.classList.add('flex');
 
@@ -108,7 +107,6 @@
 
             } else {
 
-                // Logged out
                 loggedInLinks.classList.add('hidden');
 
                 loggedOutLinks.classList.remove('hidden');

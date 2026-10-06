@@ -7,6 +7,7 @@ require('./modules');
 
 const authRouter = require('./routes/authRoutes');
 const expenceRouter = require('./routes/expenceRoutes');
+const cashfreeRoutes = require('./routes/cashfreeRoutes');
 const sequelize = require('./utils/db_connect');
 
 app.use(express.json());
@@ -25,6 +26,7 @@ app.get("/", (req, res)=>{
     });
 })
 app.use('/', authRouter);
+app.use('/', cashfreeRoutes);
 app.use('/expenses', expenceRouter);
 
 sequelize.sync({force: false})
