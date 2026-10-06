@@ -10,5 +10,6 @@ router.get('/add', expenceController.addExpencePage);
 router.post('/api/add', authMiddleware, expenceController.addExpence);
 router.delete('/delete/:id', authMiddleware, expenceController.deleteExpense);
 router.get('/leaderboard', expenceController.expenseLeaderboardPage);
+router.post('/suggest-category', authMiddleware, expenceController.suggestCategory);
 
 module.exports = router

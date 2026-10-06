@@ -1,6 +1,129 @@
+const displayExpenses = () => {
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:3000/expenses/list', {}, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+
+        })
+        .then((res) => {
+
+            const expensesData = res.data.data;
+            const tableBody = document.getElementById('expenseListTableBody');
+
+            tableBody.innerHTML = '';
+
+            if (!expensesData || expensesData.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                            No expenses added yet.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            expensesData.forEach((expense) => {
+
+                const row = document.createElement('tr');
+
+                row.className = 'hover:bg-gray-50 transition';
+
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        ${expense.amount}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        ${expense.category}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        ${expense.description}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        <button
+                            class="bg-red-600 text-white px-5 py-3 rounded-md
+                                   hover:bg-red-700 transition"
+                            onclick="handleDeleteExpense(${expense.id})"
+                        >
+                            Delete
+                        </button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+        })
+        .catch((err) => {
+
+            console.error(err);
+
+        });
+};
+
 document.addEventListener('DOMContentLoaded', ()=>{
     displayExpenses();
 })
+
+const descriptionInput = document.getElementById('description');
+const categorySelect = document.getElementById('category');
+const categorySuggestion = document.getElementById('categorySuggestion');
+
+let suggestionTimer;
+
+descriptionInput.addEventListener('input', () => {
+
+    clearTimeout(suggestionTimer);
+
+    const description = descriptionInput.value.trim();
+
+    if (!description) {
+        categorySuggestion.classList.add('hidden');
+        return;
+    }
+
+    suggestionTimer = setTimeout(() => {
+        suggestCategory(description);
+    }, 800);
+});
+
+const suggestCategory = async (description) => {
+
+    try {
+
+        
+        categorySuggestion.classList.remove('hidden');
+        categorySuggestion.textContent = 'AI is suggesting a category...';
+
+        const response = await axios.post(
+            'http://localhost:3000/expenses/suggest-category',
+            {
+                description: description
+            },{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const category = response.data.data.category;
+        categorySelect.value = category;
+
+        categorySuggestion.textContent = `AI suggested: ${category}`;
+
+    } catch (error) {
+
+        console.error('Category suggestion error:',error);
+        categorySuggestion.textContent = 'Unable to suggest category';
+
+    }
+};
 
 const handlecreateAccount = (event) => {
     event.preventDefault();
@@ -86,75 +209,6 @@ const handleAddExpence = (event) => {
         alert(message);
     })
 }
-
-const displayExpenses = () => {
-    const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/expenses/list', {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-
-        })
-        .then((res) => {
-
-            const expensesData = res.data.data;
-            const tableBody = document.getElementById('expenseListTableBody');
-
-            tableBody.innerHTML = '';
-
-            if (!expensesData || expensesData.length === 0) {
-
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                            No expenses added yet.
-                        </td>
-                    </tr>
-                `;
-
-                return;
-            }
-
-            expensesData.forEach((expense) => {
-
-                const row = document.createElement('tr');
-
-                row.className = 'hover:bg-gray-50 transition';
-
-                row.innerHTML = `
-                    <td class="px-6 py-4">
-                        ${expense.amount}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        ${expense.category}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        ${expense.description}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        <button
-                            class="bg-red-600 text-white px-5 py-3 rounded-md
-                                   hover:bg-red-700 transition"
-                            onclick="handleDeleteExpense(${expense.id})"
-                        >
-                            Delete
-                        </button>
-                    </td>
-                `;
-
-                tableBody.appendChild(row);
-            });
-
-        })
-        .catch((err) => {
-
-            console.error(err);
-
-        });
-};
 
 const handleDeleteExpense = (expenseId) => {
     

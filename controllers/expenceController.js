@@ -2,6 +2,7 @@ const { fn, col, literal } = require('sequelize');
 const Expense = require('../modules/expence');
 const User = require('../modules/user');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
+const { suggestExpenseCategory } = require('../services/geminiService');
 
 const addExpencePage = (req, res) => {
     res.render('pages/expence/add', {
@@ -96,11 +97,37 @@ const deleteExpense = async(req, res) => {
     }
 }
 
+const suggestCategory = async(req, res) => {
+    try{
+        const { description } = req.body;
+
+        if (!description || !description.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Description is required'
+            });
+        }
+
+        const category = await suggestExpenseCategory(description);
+        return res.status(200).json({
+            success: true,
+            message: 'Category suggested successfully',
+            data: {
+                category: category
+            }
+        });
+
+    }catch(err){
+        return sendErrorResponse(res, err.message, "Gemini category suggestion error", 500);
+    }
+}
+
 module.exports = {
     addExpencePage,
     addExpence,
     getAllExpences,
     getExpencePage,
     deleteExpense,
-    expenseLeaderboardPage
+    expenseLeaderboardPage,
+    suggestCategory
 }
