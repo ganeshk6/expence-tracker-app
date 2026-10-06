@@ -1,17 +1,24 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
+const { sendForgotPasswordEmail } = require('../services/sendEmailServices');
 const User = require('../modules/user');
 
 const signupPage = (req, res) => {
     res.render('pages/auth/register', {
-        title: 'Expence Tracker App - SignUp'
+        title: 'SignUp - Expence Tracker App'
     })
 }
 
 const loginPage = (req, res) => {
     res.render('pages/auth/login', {
-        title: 'Expence Tracker App - SignIn'
+        title: 'SignIn - Expence Tracker App'
+    })
+}
+
+const forgotPasswordForm = (req, res) => {
+    res.render('pages/auth/forgotPassword', {
+        title: 'Forgot Password - Expence Tracker App'
     })
 }
 
@@ -109,9 +116,40 @@ const createSignin = async (req, res) => {
     }
 };
 
+const sendForgotPasswordLink = async(req, res) => {
+    try{
+        const {email} = req.body;
+        if (!email) {
+            return sendErrorResponse(res,[],'Email is required',400);
+        }
+        const user = await User.findOne({
+            where:{
+                email:email
+            }
+        })
+        if(!user){
+            return sendErrorResponse(res, [], 'User not found for this email', 404);
+        }
+        
+        const resetLink = `http://localhost:3000/reset-password/${email}`;
+        
+        await sendForgotPasswordEmail(
+            user.email,
+            user.full_name,
+            resetLink
+        );
+
+        return sendSuccessResponse(res,{email: user.email},'I have sent you an email. Please check your inbox.',200);
+    }catch(err){
+        return sendErrorResponse(res, err.message, "Failed to send link", 500);
+    }
+}
+
 module.exports = {
     loginPage,
     signupPage,
     signup,
-    createSignin
+    createSignin,
+    forgotPasswordForm,
+    sendForgotPasswordLink
 }

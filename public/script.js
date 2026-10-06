@@ -67,63 +67,99 @@ const displayExpenses = () => {
         });
 };
 
+
+const initCategorySuggestion = () => {
+
+    const descriptionInput = document.getElementById('description');
+    const categorySelect = document.getElementById('category');
+    const categorySuggestion = document.getElementById('categorySuggestion');
+
+    let suggestionTimer;
+
+    descriptionInput.addEventListener('input', () => {
+
+        clearTimeout(suggestionTimer);
+
+        const description = descriptionInput.value.trim();
+
+        if (!description) {
+            categorySuggestion.classList.add('hidden');
+            return;
+        }
+
+        suggestionTimer = setTimeout(() => {
+            suggestCategory(description);
+        }, 800);
+    });
+
+    const suggestCategory = async (description) => {
+
+        try {
+
+            const token = localStorage.getItem('token');
+            categorySuggestion.classList.remove('hidden');
+            categorySuggestion.textContent = 'AI is suggesting a category...';
+
+            const response = await axios.post(
+                'http://localhost:3000/expenses/suggest-category',
+                {
+                    description: description
+                },{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            const category = response.data.data.category;
+            categorySelect.value = category;
+
+            categorySuggestion.textContent = `AI suggested: ${category}`;
+
+        } catch (error) {
+
+            console.error('Category suggestion error:',error);
+            categorySuggestion.textContent = 'Unable to suggest category';
+
+        }
+    };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCategorySuggestion();
+});
 document.addEventListener('DOMContentLoaded', ()=>{
     displayExpenses();
 })
 
-const descriptionInput = document.getElementById('description');
-const categorySelect = document.getElementById('category');
-const categorySuggestion = document.getElementById('categorySuggestion');
+const forgotPasswordForm =
+    document.getElementById('forgotPasswordForm');
 
-let suggestionTimer;
+if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-descriptionInput.addEventListener('input', () => {
+        const email = e.target.email.value;
 
-    clearTimeout(suggestionTimer);
+        try {
 
-    const description = descriptionInput.value.trim();
-
-    if (!description) {
-        categorySuggestion.classList.add('hidden');
-        return;
-    }
-
-    suggestionTimer = setTimeout(() => {
-        suggestCategory(description);
-    }, 800);
-});
-
-const suggestCategory = async (description) => {
-
-    try {
-
-        
-        categorySuggestion.classList.remove('hidden');
-        categorySuggestion.textContent = 'AI is suggesting a category...';
-
-        const response = await axios.post(
-            'http://localhost:3000/expenses/suggest-category',
-            {
-                description: description
-            },{
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const response = await axios.post(
+                'http://localhost:3000/password/forgotpassword',
+                {
+                    email: email
                 }
-            }
-        );
+            );
 
-        const category = response.data.data.category;
-        categorySelect.value = category;
+            console.log(response.data);
+            alert(response.data.message);
 
-        categorySuggestion.textContent = `AI suggested: ${category}`;
-
-    } catch (error) {
-
-        console.error('Category suggestion error:',error);
-        categorySuggestion.textContent = 'Unable to suggest category';
-
-    }
-};
+        } catch (error) {
+            console.error(error);
+            const message = error.response?.data?.message || 'Something went wrong';
+            alert(message);
+        }
+    });
+}
 
 const handlecreateAccount = (event) => {
     event.preventDefault();
@@ -333,3 +369,4 @@ document.getElementById("buyPremiumBtn").addEventListener("click", ()=>{
 //     .addEventListener("click", () => {
 //         handlePremiumPayment("_inline");
 //     });
+
