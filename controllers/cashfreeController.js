@@ -47,7 +47,6 @@ const getPaymentStatus = async (req, res) => {
 
     try {
         const { orderId } = req.params;
-        console.log(orderId)
         const payments = await getOrderDetails(orderId);
         
         const order = await Order.findOne({
@@ -66,7 +65,7 @@ const getPaymentStatus = async (req, res) => {
             );
         }
         const payment = payments[0];
-        console.log(payment.payment_status)
+        
         if (payment.payment_status === 'SUCCESS') {
             const startDate = new Date();
             const endDate = new Date(startDate);
@@ -80,6 +79,7 @@ const getPaymentStatus = async (req, res) => {
 
             });
 
+            // return sendSuccessResponse(res, [], "SUCCESS", 201);
             return res.render(
                 'pages/payemntStatus',
                 {
@@ -98,7 +98,7 @@ const getPaymentStatus = async (req, res) => {
                 status: 'FAILED',
                 payment_status: 'FAILED'
             });
-
+            // return sendSuccessResponse(res, [], "FAILED", 201);
             return res.render('pages/payemntStatus', {
                 success: false,
                 status: 'FAILED',
@@ -113,7 +113,7 @@ const getPaymentStatus = async (req, res) => {
                 status: 'FAILED',
                 payment_status: 'USER_DROPPED'
             });
-
+            // return sendSuccessResponse(res, [], "USER_DROPPED", 201);
             return res.render('pages/payemntStatus', {
                 success: false,
                 status: 'USER_DROPPED',
@@ -125,6 +125,7 @@ const getPaymentStatus = async (req, res) => {
         await order.update({
             payment_status:payment.payment_status
         });
+        // return sendSuccessResponse(res, [], payment.payment_status, 201);
         return res.render('pages/payemntStatus', {
             success: false,
             status: payment.payment_status,

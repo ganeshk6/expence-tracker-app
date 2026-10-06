@@ -192,37 +192,90 @@ const handleDeleteExpense = (expenseId) => {
 const cashfree = Cashfree({
     mode: 'sandbox',
 });
+const handlePremiumPayment = async (redirectTarget) => {
 
-document.getElementById("buyPremiumBtn").addEventListener("click", async () => {
-    try{
+    try {
 
         const token = localStorage.getItem('token');
-    
-        const res = await axios.post('http://localhost:3000/pay', {}, {
-            headers:{
-                Authorization: `Bearer ${token}`
+
+        const res = await axios.post(
+            'http://localhost:3000/pay',
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
-        })
-        console.log("Backend response:", res.data);
+        );
+        
+        const orderId = res.data.data.order_id;
         const paymentSessionId = res.data.data.payment_session_id;
-        console.log("Payment Session ID:", paymentSessionId);
-    
+        
         if (!paymentSessionId) {
             console.error("Payment session ID missing");
             return;
         }
-    
+
         const checkoutOptions = {
-            paymentSessionId: paymentSessionId,
-            redirectTarget: "_self",
+            paymentSessionId,
+            redirectTarget
         };
-        console.log("Opening Cashfree...");
-    
+
+        // let checkoutOptions = {
+        //       paymentSessionId,
+        //       redirectTarget: document.getElementById("cashfree-checkout"),
+        //       appearance:{
+        //           width:"325px",
+        //           height:"325px",
+        //       },
+        //   };  
+
         const result = await cashfree.checkout(checkoutOptions);
+        
+        if(redirectTarget === "_modal" || redirectTarget === "_inline"){
+            console.log(result)
+            if(result.error){
+                console.log("User as closed the popup or there is some payment error.")
+                console.log(result.error);
+            }
+            if(result.redirect){
+                console.log("Payment will be redirected");
+            }
+            if(result.paymentDetails){
+                console.log("Payment has been completed, check for payment status")
+                console.log(result.paymentDetails.paymentMessage)
+                const statusResponse = await axios.get(`http://localhost:3000/payment-status/${orderId}`);
     
-        console.log("Checkout result:", result);
-    }catch(err){
-        console.log("Something error durong payment", err.message);
+                alert("Your payment is "+ statusResponse.data.message)
+            }
+        }
+        
+    } catch (err) {
+
+        console.error(
+            "Payment Error:",
+            err.response?.data || err.message
+        );
+
     }
-    
-})
+};
+
+
+// Same tab
+document.getElementById("buyPremiumBtn").addEventListener("click", ()=>{
+    handlePremiumPayment("_self");
+});
+
+
+// Modal
+// document.getElementById("buyPremiumModalBtn")
+//     .addEventListener("click", () => {
+//         handlePremiumPayment("_modal");
+//     });
+
+
+// New tab
+// document.getElementById("buyPremiumNewTabBtn")
+//     .addEventListener("click", () => {
+//         handlePremiumPayment("_inline");
+//     });
