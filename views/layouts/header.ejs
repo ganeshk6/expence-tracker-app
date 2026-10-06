@@ -28,6 +28,12 @@
                     id="loggedInLinks"
                     class="hidden gap-5 items-center"
                 >
+                    <a  id="viewLeaderboard"
+                        href="/expenses/leaderboard"
+                        class="hidden hover:text-gray-200 "
+                    >
+                        View Leaderboard
+                    </a>
 
                     <a
                         href="/expenses"
@@ -65,7 +71,7 @@
 
                     <a
                         href="/register"
-                        class="hover:text-gray-200"
+                        class="hover:text-gray-200 d-none"
                     >
                         SignUp
                     </a>
@@ -97,6 +103,7 @@
             const loggedInLinks = document.getElementById('loggedInLinks');
             const loggedOutLinks = document.getElementById('loggedOutLinks');
             const buyPremiumBtn = document.getElementById('buyPremiumBtn');
+            const viewLeaderboard = document.getElementById('viewLeaderboard');
 
 
             if (token) {
@@ -117,7 +124,7 @@
                     );
                     
                     if (response.data.data.isPremium) {
-
+                        viewLeaderboard.classList.remove('hidden');
                         buyPremiumBtn.textContent = 'You are a Premium User';
 
                         buyPremiumBtn.disabled = true;
@@ -135,6 +142,8 @@
                             'bg-green-600',
                             'cursor-default'
                         );
+                    }else{
+                        viewLeaderboard.classList.add('hidden');
                     }
 
                 } catch (error) {

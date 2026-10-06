@@ -9,5 +9,6 @@ router.post('/list', authMiddleware, expenceController.getAllExpences);
 router.get('/add', expenceController.addExpencePage);
 router.post('/api/add', authMiddleware, expenceController.addExpence);
 router.delete('/delete/:id', authMiddleware, expenceController.deleteExpense);
+router.get('/leaderboard', expenceController.expenseLeaderboardPage);
 
 module.exports = router

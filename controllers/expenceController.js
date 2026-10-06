@@ -1,10 +1,42 @@
+const { fn, col, literal } = require('sequelize');
 const Expense = require('../modules/expence');
+const User = require('../modules/user');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
 
 const addExpencePage = (req, res) => {
     res.render('pages/expence/add', {
         title: 'Add expense - Expense Tracker App'
     })
+}
+
+const expenseLeaderboardPage = async (req, res) => {
+    try{
+        const users = await User.findAll({
+            attributes: [
+                'id',
+                'full_name',
+                [fn('COALESCE', fn('SUM', col('expences.amount')), 0), 'totalExpense']
+            ],
+            include: [
+                {
+                    model: Expense,
+                    attributes: [],
+                    required: false
+                }
+            ],
+            group: ['id', 'full_name'],
+            order: [[literal('totalExpense'), 'DESC']]
+        });
+        
+        res.render('pages/expence/leaderBoard', {
+            title: 'Expense Leaderboard - Expense Tracker App',
+            users:users
+        })
+    }catch(err){
+        res.render('pages/expence/leaderBoard', {
+            title: 'Expense Leaderboard - Expense Tracker App'
+        })
+    }
 }
 
 const addExpence = async (req, res) => {
@@ -69,5 +101,6 @@ module.exports = {
     addExpence,
     getAllExpences,
     getExpencePage,
-    deleteExpense
+    deleteExpense,
+    expenseLeaderboardPage
 }
