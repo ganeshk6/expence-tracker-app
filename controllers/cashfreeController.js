@@ -1,6 +1,7 @@
 const { createOrder, getOrderDetails } = require('../services/cashfreeService');
 const Order = require('../modules/order');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
+const { Op } = require('sequelize');
 
 const createCashfreePayment = async (req, res) => {
     try{
@@ -148,7 +149,41 @@ const getPaymentStatus = async (req, res) => {
     }
 };
 
+const getMembershipStatus = async(req, res) => {
+    try{
+        const userId = req.user.id;
+        const now = new Date();
+        const order = await Order.findOne({
+            where:{
+                userId:userId,
+                status:"PAID",
+                payment_status:"SUCCESS",
+                membership_end_date: {
+                    [Op.gt]: now
+                }
+            },
+            order:[
+                ['membership_end_date', 'DESC']
+            ]
+        })
+        if(!order){
+            return sendSuccessResponse(res, {isPremium: false}, '', 200);    
+        }
+
+        const isPremium = order.membership_end_date && new Date(order.membership_end_date) > now;
+        const data = {
+            isPremium: Boolean(isPremium),
+            membership_start_date: order.membership_start_date,
+            membership_end_date: order.membership_end_date
+        }
+        return sendSuccessResponse(res, data, '', 200);
+    }catch(err){
+        return sendErrorResponse(res, err.message, 'Unable to check membership status', 500);
+    }
+}
+
 module.exports = {
     createCashfreePayment,
-    getPaymentStatus
+    getPaymentStatus,
+    getMembershipStatus
 }

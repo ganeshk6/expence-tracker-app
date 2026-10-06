@@ -285,6 +285,9 @@
   .max-w-md {
     max-width: var(--container-md);
   }
+  .cursor-default {
+    cursor: default;
+  }
   .resize-none {
     resize: none;
   }
@@ -352,6 +355,9 @@
   }
   .bg-gray-800 {
     background-color: var(--color-gray-800);
+  }
+  .bg-green-600 {
+    background-color: var(--color-green-600);
   }
   .bg-indigo-600 {
     background-color: var(--color-indigo-600);

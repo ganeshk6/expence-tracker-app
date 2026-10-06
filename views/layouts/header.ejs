@@ -90,12 +90,13 @@
     <!-- <div id="cashfree-checkout"></div> -->
     <script>
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
 
             const token = localStorage.getItem('token');
 
             const loggedInLinks = document.getElementById('loggedInLinks');
             const loggedOutLinks = document.getElementById('loggedOutLinks');
+            const buyPremiumBtn = document.getElementById('buyPremiumBtn');
 
 
             if (token) {
@@ -104,6 +105,41 @@
                 loggedInLinks.classList.add('flex');
 
                 loggedOutLinks.classList.add('hidden');
+
+                try {
+
+                    const response = await axios.get('http://localhost:3000/membership-status',
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        }
+                    );
+                    
+                    if (response.data.data.isPremium) {
+
+                        buyPremiumBtn.textContent = 'You are a Premium User';
+
+                        buyPremiumBtn.disabled = true;
+
+                        buyPremiumBtn.classList.remove(
+                            'bg-gradient-to-r',
+                            'from-yellow-400',
+                            'via-amber-500',
+                            'to-orange-500',
+                            'hover:-translate-y-0.5',
+                            'hover:scale-105'
+                        );
+
+                        buyPremiumBtn.classList.add(
+                            'bg-green-600',
+                            'cursor-default'
+                        );
+                    }
+
+                } catch (error) {
+                    console.error('Membership status error:',error.response?.data || error.message);
+                }
 
             } else {
 
