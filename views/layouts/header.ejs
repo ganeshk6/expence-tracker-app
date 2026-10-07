@@ -104,6 +104,7 @@
             const loggedOutLinks = document.getElementById('loggedOutLinks');
             const buyPremiumBtn = document.getElementById('buyPremiumBtn');
             const viewLeaderboard = document.getElementById('viewLeaderboard');
+            const downloadExpenseBtn = document.getElementById('download-expense-btn');
 
 
             if (token) {
@@ -125,6 +126,7 @@
                     
                     if (response.data.data.isPremium) {
                         viewLeaderboard.classList.remove('hidden');
+                        downloadExpenseBtn.classList.remove('hidden');
                         buyPremiumBtn.textContent = 'You are a Premium User';
 
                         buyPremiumBtn.disabled = true;
@@ -144,6 +146,7 @@
                         );
                     }else{
                         viewLeaderboard.classList.add('hidden');
+                        downloadExpenseBtn.classList.add('hidden');
                     }
 
                 } catch (error) {
