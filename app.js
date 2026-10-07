@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const compression = require('compression');
+const morgan = require('morgan');
+const fs = require('fs');
 const app = express()
 const PORT = process.env.PORT || 3000;
 require('./modules');
@@ -18,8 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.get("/", (req, res)=>{
     res.render('index', {
         title: 'Expence Tracker App'
@@ -28,6 +29,19 @@ app.get("/", (req, res)=>{
 app.use('/', authRouter);
 app.use('/', cashfreeRoutes);
 app.use('/expenses', expenceRouter);
+
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    { flags: 'a' }
+);
+
+app.use(compression());
+
+app.use(morgan('combined', {
+    stream: accessLogStream
+}));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 sequelize.sync({force: false})
 .then(()=>{
