@@ -67,12 +67,24 @@ const getExpencePage = (req, res) => {
 const getAllExpences = async(req, res) => {
     try{
         const userId = req.user.id;
-        const expenses = await Expense.findAll({
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const offset = (page - 1) * limit;
+
+        const { count, rows: expenses } = await Expense.findAndCountAll({
             where:{
                 userId:userId
-            }
-        })
-        return sendSuccessResponse(res, expenses, "Expenses fetched successfully", 200);    
+            },
+            limit: limit,
+            offset: offset,
+
+            order: [
+                ['id', 'DESC']
+            ]
+        });
+        const totalPages = Math.ceil(count / limit);
+        
+        return sendSuccessResponse(res, {expenses, currentPage: page, totalPages, totalItems: count, limit}, "Expenses fetched successfully", 200);    
     }catch(err){
         return sendErrorResponse(res, err.message, "Failed to fetch expense", 500);
     }

@@ -1,72 +1,168 @@
-const displayExpenses = () => {
+let currentPage = 1;
+const displayExpenses = (page = 1) => {
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/expenses/list', {}, {
+    currentPage = page
+
+    axios.post(
+        `http://localhost:3000/expenses/list?page=${page}`,
+        {},
+        {
             headers: {
                 Authorization: `Bearer ${token}`
             }
+        }
+    )
+    .then((res) => {
 
-        })
-        .then((res) => {
+        const data = res.data.data;
+        const expensesData = data.expenses;
+        const tableBody = document.getElementById('expenseListTableBody');
 
-            const expensesData = res.data.data;
-            const tableBody = document.getElementById('expenseListTableBody');
+        tableBody.innerHTML = '';
 
-            tableBody.innerHTML = '';
+        if (!expensesData || expensesData.length === 0) {
 
-            if (!expensesData || expensesData.length === 0) {
-
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                            No expenses added yet.
-                        </td>
-                    </tr>
-                `;
-
-                return;
-            }
-
-            expensesData.forEach((expense) => {
-
-                const row = document.createElement('tr');
-
-                row.className = 'hover:bg-gray-50 transition';
-
-                row.innerHTML = `
-                    <td class="px-6 py-4">
-                        ${expense.amount}
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4"
+                        class="px-6 py-10 text-center text-gray-500">
+                        No expenses added yet.
                     </td>
+                </tr>
+            `;
 
-                    <td class="px-6 py-4">
-                        ${expense.category}
-                    </td>
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
 
-                    <td class="px-6 py-4">
-                        ${expense.description}
-                    </td>
+        expensesData.forEach((expense) => {
 
-                    <td class="px-6 py-4">
-                        <button
-                            class="bg-red-600 text-white px-5 py-3 rounded-md
-                                   hover:bg-red-700 transition"
-                            onclick="handleDeleteExpense(${expense.id})"
-                        >
-                            Delete
-                        </button>
-                    </td>
-                `;
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition';
 
-                tableBody.appendChild(row);
-            });
+            row.innerHTML = `
 
-        })
-        .catch((err) => {
-
-            console.error(err);
-
+                <td class="px-6 py-4">
+                    ₹${expense.amount}
+                </td>
+                <td class="px-6 py-4">
+                    ${expense.category}
+                </td>
+                <td class="px-6 py-4">
+                    ${expense.description}
+                </td>
+                <td class="px-6 py-4">
+                    <button
+                        class="bg-red-600 text-white px-5 py-3
+                               rounded-md hover:bg-red-700 transition"
+                        onclick="handleDeleteExpense(${expense.id})"
+                    >
+                        Delete
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
         });
+        createPagination(data.currentPage, data.totalPages);
+    })
+    .catch((err) => {
+        console.error(err);
+    });
 };
+const createPagination = (currentPage, totalPages) => {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    if (totalPages <= 1) {
+        return;
+    }
+    if (currentPage > 1) {
 
+        pagination.innerHTML += `
+            <button
+                onclick="displayExpenses(${currentPage - 1})"
+                class="px-3 py-2 border rounded-md
+                       hover:bg-gray-100"
+            >
+                Previous
+            </button>
+        `;
+    }
+
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(
+        totalPages,
+        startPage + 4
+    );
+
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1,endPage - 4);
+    }
+
+    if (startPage > 1) {
+        pagination.innerHTML += `
+            <button
+                onclick="displayExpenses(1)"
+                class="px-3 py-2 border rounded-md
+                       hover:bg-gray-100"
+            >
+                1
+            </button>
+        `;
+
+        if (startPage > 2) {
+            pagination.innerHTML += `
+                <span class="px-2">...</span>
+            `;
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+
+        pagination.innerHTML += `
+            <button
+                onclick="displayExpenses(${i})"
+                class="px-3 py-2 border rounded-md
+                    ${
+                        i === currentPage
+                        ? 'bg-blue-600 text-white'
+                        : 'hover:bg-gray-100'
+                    }"
+            >
+                ${i}
+            </button>
+        `;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            pagination.innerHTML += `
+                <span class="px-2">...</span>
+            `;
+        }
+
+        pagination.innerHTML += `
+            <button
+                onclick="displayExpenses(${totalPages})"
+                class="px-3 py-2 border rounded-md
+                       hover:bg-gray-100"
+            >
+                ${totalPages}
+            </button>
+        `;
+    }
+
+    if (currentPage < totalPages) {
+        pagination.innerHTML += `
+            <button
+                onclick="displayExpenses(${currentPage + 1})"
+                class="px-3 py-2 border rounded-md
+                       hover:bg-gray-100"
+            >
+                Next
+            </button>
+        `;
+    }
+};
 
 const initCategorySuggestion = () => {
 
@@ -129,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCategorySuggestion();
 });
 document.addEventListener('DOMContentLoaded', ()=>{
-    displayExpenses();
+    displayExpenses(currentPage);
 })
 
 const forgotPasswordForm =
@@ -292,7 +388,7 @@ const handleDeleteExpense = (expenseId) => {
         .then((res) => {
 
             alert(res.data.message);
-            displayExpenses();
+            displayExpenses(currentPage);
 
         })
         .catch((err) => {
