@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const { sendSuccessResponse, sendErrorResponse } = require('../utils/response');
 const { sendForgotPasswordEmail } = require('../services/sendEmailServices');
+const sequelize = require("../utils/db_connect");
 const User = require('../modules/user');
+const ForgotPasswordRequests = require('../modules/ForgotPasswordRequests');
 
 const signupPage = (req, res) => {
     res.render('pages/auth/register', {
@@ -117,9 +120,11 @@ const createSignin = async (req, res) => {
 };
 
 const sendForgotPasswordLink = async(req, res) => {
+    const transaction = await sequelize.transaction();
     try{
         const {email} = req.body;
         if (!email) {
+            await transaction.rollback();
             return sendErrorResponse(res,[],'Email is required',400);
         }
         const user = await User.findOne({
@@ -128,20 +133,108 @@ const sendForgotPasswordLink = async(req, res) => {
             }
         })
         if(!user){
+            await transaction.rollback();
             return sendErrorResponse(res, [], 'User not found for this email', 404);
         }
-        
-        const resetLink = `http://localhost:3000/reset-password/${email}`;
+        const requestId = uuidv4();
+        await ForgotPasswordRequests.create({
+            id: requestId,
+            userId: user.id,
+            isactive: true
+        }, {
+            transaction
+        });
+        const resetLink = `http://localhost:3000/password/resetpassword/${requestId}`;
         
         await sendForgotPasswordEmail(
             user.email,
             user.full_name,
             resetLink
         );
-
+        await transaction.commit();
         return sendSuccessResponse(res,{email: user.email},'I have sent you an email. Please check your inbox.',200);
     }catch(err){
+        await transaction.rollback();
         return sendErrorResponse(res, err.message, "Failed to send link", 500);
+    }
+}
+
+const resetPasswordForm = async (req, res) => {
+    try{
+        const {id} = req.params;
+
+        const request = await ForgotPasswordRequests.findOne({
+            where:{
+                id:id,
+                isactive: true
+            }
+        })
+        if(!request){
+            return res.status(400).send(`
+                <h2>Invalid or expired password reset link</h2>
+            `);
+        }
+        return res.render('pages/auth/resetPassword', {
+            requestId: id
+        });
+    }catch(err){
+
+    }
+}
+
+const resetPassword = async(req, res) => {
+    const transaction = await sequelize.transaction();
+    try{
+        const {requestId, password, confirmPassword } = req.body;
+        if (!requestId || !password || !confirmPassword) {
+            await transaction.rollback();
+            return sendErrorResponse(res,[],'All fields are required',400);
+        }
+        if (password !== confirmPassword) {
+            await transaction.rollback();
+            return sendErrorResponse(res,[],'Passwords do not match',400);
+        }
+
+        const forgotRequest = await ForgotPasswordRequests.findOne({
+                                        where: {
+                                            id: requestId,
+                                            isactive: true
+                                        },
+                                        transaction
+                                    });
+
+        if (!forgotRequest) {
+            await transaction.rollback();
+            return sendErrorResponse(res,[],'Invalid or expired reset link',400);
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.update(
+            {
+                password: hashedPassword
+            },
+            {
+                where: {
+                    id: forgotRequest.userId
+                },
+                transaction
+            }
+        );
+        await ForgotPasswordRequests.update(
+            {
+                isactive: false
+            },
+            {
+                where: {
+                    id: requestId
+                },
+                transaction
+            }
+        );
+        await transaction.commit();
+        return sendSuccessResponse(res,[],'Password reset successfully',200);
+    }catch(err){
+        await transaction.rollback();
+        return sendErrorResponse(res,err.message,'Failed to reset password',500);
     }
 }
 
@@ -151,5 +244,7 @@ module.exports = {
     signup,
     createSignin,
     forgotPasswordForm,
-    sendForgotPasswordLink
+    sendForgotPasswordLink,
+    resetPasswordForm,
+    resetPassword
 }

@@ -160,6 +160,34 @@ if (forgotPasswordForm) {
         }
     });
 }
+const resetPasswordForm = document.getElementById('resetPasswordForm');
+
+if(resetPasswordForm){
+    resetPasswordForm.addEventListener('submit', async (event) => {    
+        event.preventDefault();
+
+        const requestId = document.getElementById('requestId').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+    
+        try {
+            const response = await axios.post(
+                'http://localhost:3000/password/resetpassword',
+                {
+                    requestId,
+                    password,
+                    confirmPassword
+                }
+            );
+            alert(response.data.message);
+            window.location.href = '/login';
+    
+        } catch (error) {
+            console.log(error);
+            alert(error.response?.data?.message || 'Something went wrong');
+        }
+    });
+}
 
 const handlecreateAccount = (event) => {
     event.preventDefault();
