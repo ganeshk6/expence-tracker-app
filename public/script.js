@@ -53,6 +53,9 @@ const displayExpenses = (page = 1) => {
                     ${expense.description}
                 </td>
                 <td class="px-6 py-4">
+                    ${expense.note}
+                </td>
+                <td class="px-6 py-4">
                     <button
                         class="bg-red-600 text-white px-5 py-3
                                rounded-md hover:bg-red-700 transition"
@@ -70,11 +73,15 @@ const displayExpenses = (page = 1) => {
         console.error(err);
     });
 };
-document.getElementById('limit').addEventListener('change', function () {
+const limitSelect = document.getElementById('limit');
 
-    currentLimit = parseInt(this.value);
-    displayExpenses(1);
-});
+if (limitSelect) {
+    limitSelect.addEventListener('change', function () {
+        currentLimit = parseInt(this.value);
+        displayExpenses(1);
+    });
+}
+
 const createPagination = (currentPage, totalPages) => {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = '';
@@ -175,6 +182,10 @@ const initCategorySuggestion = () => {
     const descriptionInput = document.getElementById('description');
     const categorySelect = document.getElementById('category');
     const categorySuggestion = document.getElementById('categorySuggestion');
+
+    if (!descriptionInput || !categorySelect || !categorySuggestion) {
+        return;
+    }
 
     let suggestionTimer;
 
@@ -353,11 +364,13 @@ const handleAddExpence = (event) => {
     const amount = event.target.amount.value;
     const category = event.target.category.value;
     const description = event.target.description.value;
+    const note = event.target.note.value;
 
     const data = {
         amount:amount,
         category:category,
-        description:description
+        description:description,
+        note:note
     }
     const token = localStorage.getItem('token');
     axios.post('http://localhost:3000/expenses/api/add',data,{

@@ -238,6 +238,25 @@ const resetPassword = async(req, res) => {
     }
 }
 
+const userLogout = async(req, res) => {
+    try {
+
+        return res.status(200).json({
+            success: true,
+            message: 'Logout successfully'
+        });
+
+    } catch (error) {
+
+        console.error('Logout error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to logout'
+        });
+    }
+}
+
 module.exports = {
     loginPage,
     signupPage,
@@ -246,5 +265,6 @@ module.exports = {
     forgotPasswordForm,
     sendForgotPasswordLink,
     resetPasswordForm,
-    resetPassword
+    resetPassword,
+    userLogout
 }

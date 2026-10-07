@@ -43,13 +43,14 @@ const expenseLeaderboardPage = async (req, res) => {
 const addExpence = async (req, res) => {
     try{
         const userId = req.user.id;
-        const {amount, category, description} = req.body;
+        const {amount, category, description, note} = req.body;
 
         const expense = await Expense.create({
             userId:userId,
             amount:amount,
             category:category,
-            description:description
+            description:description,
+            note:note
         });
         return sendSuccessResponse(res,expense,'Expense added successfully',201);
 

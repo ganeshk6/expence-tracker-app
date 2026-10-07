@@ -9,6 +9,7 @@ router.get('/login', authController.loginPage);
 router.get('/forgot-password', authController.forgotPasswordForm);
 router.post('/api/signup', authController.signup);
 router.post('/api/login', authController.createSignin);
+router.get('/api/logout', authMiddleware, authController.userLogout);
 router.post('/password/resetpassword',authController.resetPassword);
 router.post('/password/forgotpassword', authController.sendForgotPasswordLink);
 router.get('/password/resetpassword/:id', authController.resetPasswordForm);

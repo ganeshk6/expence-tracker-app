@@ -106,72 +106,105 @@
             const viewLeaderboard = document.getElementById('viewLeaderboard');
             const downloadExpenseBtn = document.getElementById('download-expense-btn');
 
-
             if (token) {
 
-                loggedInLinks.classList.remove('hidden');
-                loggedInLinks.classList.add('flex');
+                loggedInLinks?.classList.remove('hidden');
+                loggedInLinks?.classList.add('flex');
 
-                loggedOutLinks.classList.add('hidden');
+                loggedOutLinks?.classList.add('hidden');
 
                 try {
 
-                    const response = await axios.get('http://localhost:3000/membership-status',
+                    const response = await axios.get(
+                        'http://localhost:3000/membership-status',
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`
                             }
                         }
                     );
-                    
+
                     if (response.data.data.isPremium) {
-                        viewLeaderboard.classList.remove('hidden');
-                        downloadExpenseBtn.classList.remove('hidden');
-                        buyPremiumBtn.textContent = 'You are a Premium User';
 
-                        buyPremiumBtn.disabled = true;
+                        viewLeaderboard?.classList.remove('hidden');
+                        downloadExpenseBtn?.classList.remove('hidden');
 
-                        buyPremiumBtn.classList.remove(
-                            'bg-gradient-to-r',
-                            'from-yellow-400',
-                            'via-amber-500',
-                            'to-orange-500',
-                            'hover:-translate-y-0.5',
-                            'hover:scale-105'
-                        );
+                        if (buyPremiumBtn) {
+                            buyPremiumBtn.textContent = 'You are a Premium User';
+                            buyPremiumBtn.disabled = true;
 
-                        buyPremiumBtn.classList.add(
-                            'bg-green-600',
-                            'cursor-default'
-                        );
-                    }else{
-                        viewLeaderboard.classList.add('hidden');
-                        downloadExpenseBtn.classList.add('hidden');
+                            buyPremiumBtn.classList.remove(
+                                'bg-gradient-to-r',
+                                'from-yellow-400',
+                                'via-amber-500',
+                                'to-orange-500',
+                                'hover:-translate-y-0.5',
+                                'hover:scale-105'
+                            );
+
+                            buyPremiumBtn.classList.add(
+                                'bg-green-600',
+                                'cursor-default'
+                            );
+                        }
+
+                    } else {
+
+                        viewLeaderboard?.classList.add('hidden');
+                        downloadExpenseBtn?.classList.add('hidden');
+
                     }
 
                 } catch (error) {
-                    console.error('Membership status error:',error.response?.data || error.message);
+
+                    console.error(
+                        'Membership status error:',
+                        error.response?.data || error.message
+                    );
+
                 }
 
             } else {
 
-                loggedInLinks.classList.add('hidden');
+                loggedInLinks?.classList.add('hidden');
 
-                loggedOutLinks.classList.remove('hidden');
-                loggedOutLinks.classList.add('flex');
+                loggedOutLinks?.classList.remove('hidden');
+                loggedOutLinks?.classList.add('flex');
 
             }
 
         });
 
 
-        const handleLogout = () => {
+        const handleLogout = async () => {
 
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            const token = localStorage.getItem('token');
 
-            window.location.href = '/login';
+            try {
 
+                await axios.post(
+                    'http://localhost:3000/api/logout',
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+
+                window.location.href = '/login';
+
+            } catch (error) {
+
+                console.error('Logout error:',error.response?.data || error.message);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+
+                window.location.href = '/login';
+            }
         };
 
     </script>
