@@ -1,10 +1,11 @@
 let currentPage = 1;
+let currentLimit = 10;
 const displayExpenses = (page = 1) => {
     const token = localStorage.getItem('token');
     currentPage = page
 
     axios.post(
-        `http://localhost:3000/expenses/list?page=${page}`,
+        `http://localhost:3000/expenses/list?page=${page}&limit=${currentLimit}`,
         {},
         {
             headers: {
@@ -69,6 +70,11 @@ const displayExpenses = (page = 1) => {
         console.error(err);
     });
 };
+document.getElementById('limit').addEventListener('change', function () {
+
+    currentLimit = parseInt(this.value);
+    displayExpenses(1);
+});
 const createPagination = (currentPage, totalPages) => {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = '';
@@ -224,9 +230,12 @@ const initCategorySuggestion = () => {
 document.addEventListener('DOMContentLoaded', () => {
     initCategorySuggestion();
 });
-document.addEventListener('DOMContentLoaded', ()=>{
-    displayExpenses(currentPage);
-})
+document.addEventListener('DOMContentLoaded', () => {
+    currentLimit = 10;
+    currentPage = 1;
+
+    displayExpenses(1);
+});
 
 const forgotPasswordForm =
     document.getElementById('forgotPasswordForm');

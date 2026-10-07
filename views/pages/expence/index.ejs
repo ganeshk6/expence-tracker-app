@@ -1,12 +1,31 @@
 <%- include('../../layouts/header', { title: 'All Expenses - Expense Tracker' }) %>
-<div class="flex justify-between items-center mb-5">
-    <p class="text-2xl font-bold text-gray-800">All Expenses</p>
-
-    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden" id="download-expense-btn">
-        Download
-    </button>
-</div>
 <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+    <div class="flex justify-between items-center mb-5 pt-3 px-5">
+        <p class="text-2xl font-bold text-gray-800">
+            All Expenses
+        </p>
+        <div class="flex items-center gap-2">
+            <label for="limit" class="text-sm font-medium text-gray-600">
+                Show:
+            </label>
+
+            <select
+                id="limit"
+                class="border border-gray-300 rounded-lg px-3 py-2 text-sm 
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden" id="download-expense-btn">
+                Download
+            </button>
+        </div>
+    </div>
     <table class="w-full text-left text-sm text-gray-600">
         <thead class="bg-gray-100 text-xs uppercase text-gray-700">
             <tr>
