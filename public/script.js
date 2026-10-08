@@ -516,3 +516,50 @@ document.getElementById("buyPremiumBtn").addEventListener("click", ()=>{
 //         handlePremiumPayment("_inline");
 //     });
 
+const downloadExpenseFile = () => {
+
+    const token = localStorage.getItem("token");
+
+    axios.post(
+        "http://localhost:3000/expenses/download",
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+    .then((res) => {
+
+        const fileUrl = res.data.data.fileUrl;
+        const link = document.createElement("a");
+
+        link.href = fileUrl;
+        link.setAttribute("download", "");
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+
+    })
+    .catch((err) => {
+
+        console.error(err);
+
+        alert(
+            err.response?.data?.message ||
+            "Failed to download expenses"
+        );
+
+    });
+};
+
+const downloadButton = document.getElementById("download-expense-btn");
+
+if (downloadButton) {
+    downloadButton.addEventListener("click",
+        downloadExpenseFile
+    );
+}
