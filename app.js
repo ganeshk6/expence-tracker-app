@@ -1,10 +1,14 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const compression = require('compression');
 const morgan = require('morgan');
 const fs = require('fs');
 const app = express()
+app.use(cors({
+    origin: process.env.API_URL
+}));
 const PORT = process.env.PORT || 3000;
 require('./modules');
 

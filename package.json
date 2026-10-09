@@ -24,6 +24,7 @@
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^6.0.6",
     "compression": "^1.8.2",
+    "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "ejs": "^7.0.1",
     "express": "^5.2.1",
