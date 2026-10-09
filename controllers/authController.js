@@ -144,7 +144,7 @@ const sendForgotPasswordLink = async(req, res) => {
         }, {
             transaction
         });
-        const resetLink = `http://localhost:3000/password/resetpassword/${requestId}`;
+        const resetLink = `${process.env.API_URL}/password/resetpassword/${requestId}`;
         
         await sendForgotPasswordEmail(
             user.email,

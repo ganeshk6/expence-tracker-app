@@ -1,3 +1,6 @@
+const API_URL = 'http://15.252.146.151';
+// const API_URL = 'http://localhost:3000';
+
 let currentPage = 1;
 let currentLimit = 10;
 const displayExpenses = (page = 1) => {
@@ -5,7 +8,7 @@ const displayExpenses = (page = 1) => {
     currentPage = page
 
     axios.post(
-        `http://localhost:3000/expenses/list?page=${page}&limit=${currentLimit}`,
+        `${API_URL}/expenses/list?page=${page}&limit=${currentLimit}`,
         {},
         {
             headers: {
@@ -214,7 +217,7 @@ const initCategorySuggestion = () => {
             categorySuggestion.textContent = 'AI is suggesting a category...';
 
             const response = await axios.post(
-                'http://localhost:3000/expenses/suggest-category',
+                `${API_URL}/expenses/suggest-category`,
                 {
                     description: description
                 },{
@@ -260,7 +263,7 @@ if (forgotPasswordForm) {
         try {
 
             const response = await axios.post(
-                'http://localhost:3000/password/forgotpassword',
+                `${API_URL}/password/forgotpassword`,
                 {
                     email: email
                 }
@@ -288,7 +291,7 @@ if(resetPasswordForm){
     
         try {
             const response = await axios.post(
-                'http://localhost:3000/password/resetpassword',
+                `${API_URL}/password/resetpassword`,
                 {
                     requestId,
                     password,
@@ -318,7 +321,7 @@ const handlecreateAccount = (event) => {
         password:password
     }
 
-    axios.post('http://localhost:3000/api/signup', data)
+    axios.post(`${API_URL}/api/signup`, data)
     .then((res)=>{
         const token = res.data.data.token;
         localStorage.setItem('token',token);
@@ -343,7 +346,7 @@ const handleLogin = (event) => {
         password:password
     }
 
-    axios.post('http://localhost:3000/api/login', data)
+    axios.post(`${API_URL}/api/login`, data)
     .then((res)=>{
         const token = res.data.data.token;
         localStorage.setItem('token',token);
@@ -373,7 +376,7 @@ const handleAddExpence = (event) => {
         note:note
     }
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/expenses/api/add',data,{
+    axios.post(`${API_URL}/expenses/api/add`,data,{
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -402,7 +405,7 @@ const handleDeleteExpense = (expenseId) => {
         return;
     }
     const token = localStorage.getItem('token');
-    axios.delete(`http://localhost:3000/expenses/delete/${expenseId}`,{
+    axios.delete(`${API_URL}/expenses/delete/${expenseId}`,{
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -435,7 +438,7 @@ const handlePremiumPayment = async (redirectTarget) => {
         const token = localStorage.getItem('token');
 
         const res = await axios.post(
-            'http://localhost:3000/pay',
+            `${API_URL}/pay`,
             {},
             {
                 headers: {
@@ -480,7 +483,7 @@ const handlePremiumPayment = async (redirectTarget) => {
             if(result.paymentDetails){
                 console.log("Payment has been completed, check for payment status")
                 console.log(result.paymentDetails.paymentMessage)
-                const statusResponse = await axios.get(`http://localhost:3000/payment-status/${orderId}`);
+                const statusResponse = await axios.get(`${API_URL}/payment-status/${orderId}`);
     
                 alert("Your payment is "+ statusResponse.data.message)
             }
@@ -521,7 +524,7 @@ const downloadExpenseFile = () => {
     const token = localStorage.getItem("token");
 
     axios.post(
-        "http://localhost:3000/expenses/download",
+        `${API_URL}/expenses/download`,
         {},
         {
             headers: {

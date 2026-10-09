@@ -95,7 +95,8 @@
 
     <!-- <div id="cashfree-checkout"></div> -->
     <script>
-
+        const API_URL_ALT = 'http://15.252.146.151';
+        // const API_URL_ALT = 'http://localhost:3000';
         document.addEventListener('DOMContentLoaded', async () => {
 
             const token = localStorage.getItem('token');
@@ -116,7 +117,7 @@
                 try {
 
                     const response = await axios.get(
-                        'http://localhost:3000/membership-status',
+                        `${API_URL_ALT}/membership-status`,
                         {
                             headers: {
                                 Authorization: `Bearer ${token}`
@@ -183,7 +184,7 @@
             try {
 
                 await axios.post(
-                    'http://localhost:3000/api/logout',
+                    `${API_URL_ALT}/api/logout`,
                     {},
                     {
                         headers: {

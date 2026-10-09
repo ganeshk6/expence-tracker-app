@@ -22,7 +22,7 @@ export const createOrder = async(
                 "customer_phone": customerPhone
             },
             "order_meta": {
-                "return_url": "http://localhost:3000/payment-status/"+orderId,
+                "return_url": `${process.env.API_URL}/payment-status/`+orderId,
                 "payment_methods": "cc,dc,upi"
             },
             "order_expiry_time": fromattedExpiryDate
