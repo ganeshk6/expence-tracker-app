@@ -24,6 +24,8 @@ const Expence = sequelize.define('expences', {
         type: DataTypes.TEXT,
         allowNull: true
     }
-})
+},{
+    timestamps: true
+});
 
 module.exports = Expence

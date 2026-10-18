@@ -1,14 +1,72 @@
-const API_URL = 'http://15.252.146.151';
-// const API_URL = 'http://localhost:3000';
+// const API_URL = 'http://15.252.146.151';
+const API_URL = 'http://localhost:3000';
 
 let currentPage = 1;
 let currentLimit = 10;
+let currentFilterType = '';
+let currentFilterValue = '';
+
+const getExpenseFilter = () => {
+    const daily = document.getElementById('dailyFilter')?.value || '';
+    const monthly = document.getElementById('monthlyFilter')?.value || '';
+    const yearly = document.getElementById('yearlyFilter')?.value || '';
+
+    if (daily) {
+        return {
+            filterType: 'daily',
+            filterValue: daily
+        };
+    }
+
+    if (monthly) {
+        return {
+            filterType: 'monthly',
+            filterValue: monthly
+        };
+    }
+
+    if (yearly) {
+        return {
+            filterType: 'yearly',
+            filterValue: yearly
+        };
+    }
+
+    return {
+        filterType: '',
+        filterValue: ''
+    };
+};
+
 const displayExpenses = (page = 1) => {
+    const tableBody = document.getElementById('expenseListTableBody');
+    const pagination = document.getElementById('pagination');
+
+    // Stop if the expenses table does not exist on this page
+    if (!tableBody || !pagination) {
+        console.warn('Expense table or pagination element not found.');
+        return;
+    }
     const token = localStorage.getItem('token');
     currentPage = page
 
+    const filter = getExpenseFilter();
+
+    currentFilterType = filter.filterType;
+    currentFilterValue = filter.filterValue;
+
+    const params = new URLSearchParams({
+        page: String(page),
+        limit: String(currentLimit)
+    });
+
+    if (currentFilterType && currentFilterValue) {
+        params.set('filterType', currentFilterType);
+        params.set('filterValue', currentFilterValue);
+    }
+
     axios.post(
-        `${API_URL}/expenses/list?page=${page}&limit=${currentLimit}`,
+        `${API_URL}/expenses/list?${params.toString()}`,
         {},
         {
             headers: {
@@ -21,14 +79,14 @@ const displayExpenses = (page = 1) => {
         const data = res.data.data;
         const expensesData = data.expenses;
         const tableBody = document.getElementById('expenseListTableBody');
-
+        
         tableBody.innerHTML = '';
 
         if (!expensesData || expensesData.length === 0) {
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="4"
+                    <td colspan="6"
                         class="px-6 py-10 text-center text-gray-500">
                         No expenses added yet.
                     </td>
@@ -59,6 +117,9 @@ const displayExpenses = (page = 1) => {
                     ${expense.note}
                 </td>
                 <td class="px-6 py-4">
+                    ${expense.expenseDate}
+                </td>
+                <td class="px-6 py-4">
                     <button
                         class="bg-red-600 text-white px-5 py-3
                                rounded-md hover:bg-red-700 transition"
@@ -76,11 +137,48 @@ const displayExpenses = (page = 1) => {
         console.error(err);
     });
 };
-const limitSelect = document.getElementById('limit');
+document.addEventListener('DOMContentLoaded', () => {
+    const dailyFilter = document.getElementById('dailyFilter');
+    const monthlyFilter = document.getElementById('monthlyFilter');
+    const yearlyFilter = document.getElementById('yearlyFilter');
+    const clearFilters = document.getElementById('clearExpenseFilters');
+
+    if (dailyFilter && monthlyFilter && yearlyFilter) {
+        dailyFilter.addEventListener('change', () => {
+            monthlyFilter.value = '';
+            yearlyFilter.value = '';
+            displayExpenses(1);
+        });
+
+        monthlyFilter.addEventListener('change', () => {
+            dailyFilter.value = '';
+            yearlyFilter.value = '';
+            displayExpenses(1);
+        });
+
+        yearlyFilter.addEventListener('change', () => {
+            dailyFilter.value = '';
+            monthlyFilter.value = '';
+            displayExpenses(1);
+        });
+    }
+
+    if (clearFilters) {
+        clearFilters.addEventListener('click', () => {
+            if (dailyFilter) dailyFilter.value = '';
+            if (monthlyFilter) monthlyFilter.value = '';
+            if (yearlyFilter) yearlyFilter.value = '';
+
+            displayExpenses(1);
+        });
+    }
+});
+
+const limitSelect = document.getElementById('limitPagination');
 
 if (limitSelect) {
     limitSelect.addEventListener('change', function () {
-        currentLimit = parseInt(this.value);
+        currentLimit = parseInt(this.value, 10) || 10;
         displayExpenses(1);
     });
 }
@@ -520,11 +618,19 @@ document.getElementById("buyPremiumBtn").addEventListener("click", ()=>{
 //     });
 
 const downloadExpenseFile = () => {
+    const filter = getExpenseFilter();
 
+    const params = new URLSearchParams();
+
+    if (filter.filterType && filter.filterValue) {
+        params.set('filterType', filter.filterType);
+        params.set('filterValue', filter.filterValue);
+    }
+    
     const token = localStorage.getItem("token");
 
     axios.post(
-        `${API_URL}/expenses/download`,
+        `${API_URL}/expenses/download?${params.toString()}`,
         {},
         {
             headers: {

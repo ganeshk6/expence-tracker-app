@@ -4,23 +4,66 @@
         <p class="text-2xl font-bold text-gray-800">
             All Expenses
         </p>
-        <div class="flex items-center gap-2">
-            <label for="limitPagination" class="text-sm font-medium text-gray-600">
-                Show:
-            </label>
-
-            <select
-                id="limitPagination"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <label for="dailyFilter" class="text-sm font-medium text-gray-600">
+                    Daily:
+                </label>
+                <input
+                    type="date"
+                    id="dailyFilter"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="monthlyFilter" class="text-sm font-medium text-gray-600">
+                    Monthly:
+                </label>
+                <input
+                    type="month"
+                    id="monthlyFilter"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="yearlyFilter" class="text-sm font-medium text-gray-600">
+                    Yearly:
+                </label>
+                <input
+                    type="number"
+                    id="yearlyFilter"
+                    min="2000"
+                    max="2100"
+                    step="1"
+                    placeholder="YYYY"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-24 focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+            <button
+                type="button"
+                id="clearExpenseFilters"
+                class="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100"
             >
-                <option value="2">2</option>
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+                Clear
+            </button>
+            <div class="flex items-center gap-2">
+                <label for="limitPagination" class="text-sm font-medium text-gray-600">
+                    Show:
+                </label>
+    
+                <select
+                    id="limitPagination"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm 
+                        focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
             <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden" id="download-expense-btn">
                 Download
             </button>
@@ -33,6 +76,7 @@
                 <th class="px-6 py-4">Category</th>
                 <th class="px-6 py-4">Description</th>
                 <th class="px-6 py-4">Note</th>
+                <th class="px-6 py-4">Date</th>
                 <th class="px-6 py-4">Action</th>
             </tr>
         </thead>
