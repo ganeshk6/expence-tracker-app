@@ -1,5 +1,5 @@
-// const API_URL = 'http://15.252.146.151';
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://15.252.146.151';
+// const API_URL = 'http://localhost:3000';
 
 let currentPage = 1;
 let currentLimit = 10;
